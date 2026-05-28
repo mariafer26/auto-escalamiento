@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service MonitorService {
+
+  rpc Ping (Empty) returns (Pong);
+
+  rpc GetMetrics (Empty) returns (Metrics);
+}
+
+message Empty {}
+
+message Pong {
+  string message = 1;
+}
+
+message Metrics {
+  int32 cpu = 1;
+  int32 memory = 2;
+}
