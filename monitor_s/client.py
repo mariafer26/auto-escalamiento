@@ -1,16 +1,23 @@
 import grpc
 import time
 
+from controller_asg.controller import ControllerASG
 from generated import monitor_pb2
 from generated import monitor_pb2_grpc
 
 
-instances = [
-     "54.159.119.132:50051"
+
+controller = ControllerASG()
+
+protected_instances = [
+    "i-0d7dad07f45cac19b"
 ]
 
+instances = controller.get_instance_addresses()
 
 while True:
+
+    instances = controller.get_instance_addresses()
 
     print("\n--- Monitoring Instances ---\n")
 
@@ -74,22 +81,38 @@ while True:
             f"\nAverage CPU: {average_cpu:.2f}%"
         )
 
-        if average_cpu > 75:
+        decision = controller.decide(
+            average_cpu,
+            active_instances
+        )
 
-            print(
-                "Decision: scale up - create new instance"
-            )
+        print(
+            f"Decision: {decision}"
+        )
 
-        elif average_cpu < 25:
+        if decision == "scale_up":
 
-            print(
-                "Decision: scale down - remove instance"
-            )
+            controller.create_instance()
+            time.sleep(60)
 
-        else:
+        elif (
+            decision == "scale_down"
+            and active_instances > 1
+        ):
 
-            print(
-                "Decision: keep current instances"
-            )
+            instances_data = controller.list_instances()
+
+            for instance_data in instances_data:
+
+                if (
+                    instance_data["state"] == "running"
+                    and instance_data["id"] not in protected_instances
+                ):
+
+                    controller.terminate_instance(
+                        instance_data["id"]
+                    )
+
+                    break
 
     time.sleep(5)

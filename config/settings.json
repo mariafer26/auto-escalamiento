@@ -1,0 +1,25 @@
+{
+    "_comment": "ControllerASG configuration",
+
+    "min_instances": 1,
+
+    "max_instances": 3,
+
+    "scale_up_threshold": 85,
+
+    "scale_down_threshold": 25,
+
+    "grpc_port": 50051,
+
+    "instance_type": "t2.micro",
+
+    "region": "us-east-1",
+
+    "ami_id": "ami-0b06a893455cc237f",
+
+    "security_group_id": "sg-0ff33d03c654f9d77",
+
+    "key_name": "proyecto2-key",
+
+    "subnet_id": "subnet-0aa98311123f840ad"
+}
