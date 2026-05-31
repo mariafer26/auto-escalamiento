@@ -6,8 +6,7 @@ from generated import monitor_pb2_grpc
 
 
 instances = [
-    "IP_PUBLICA_EC2_1:50051",
-    "IP_PUBLICA_EC2_2:50051"
+     "54.159.119.132:50051"
 ]
 
 
