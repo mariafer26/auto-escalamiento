@@ -47,8 +47,19 @@ class ControllerASG:
             for instance in reservation["Instances"]:
 
                 if instance["State"]["Name"] == "running":
+
+                    instance_name = next(
+                        (
+                            tag["Value"]
+                            for tag in instance.get("Tags", [])
+                            if tag["Key"] == "Name"
+                        ),
+                        "No Name"
+                    )
+
                     instances.append({
                         "id": instance["InstanceId"],
+                        "name": instance_name,
                         "state": instance["State"]["Name"],
                         "type": instance["InstanceType"],
                         "public_ip": instance.get(
@@ -58,16 +69,24 @@ class ControllerASG:
                     })
 
         return instances
-    
+
     def get_instance_addresses(self):
 
         instances = self.list_instances()
 
         addresses = []
 
+        valid_names = [
+            "monitorc-1",
+            "AutoScaledInstance"
+        ]
+
         for instance in instances:
 
-            if instance["public_ip"]:
+            if (
+                instance["public_ip"]
+                and instance["name"] in valid_names
+            ):
 
                 addresses.append(
                     f"{instance['public_ip']}:50051"
@@ -89,10 +108,11 @@ class ControllerASG:
             SubnetId=self.config["subnet_id"],
 
             UserData="""#!/bin/bash
-            cd /home/ubuntu/proyecto2-autoscaling
-            source venv/bin/activate
-            PYTHONPATH=. nohup python monitor_c/server.py 50051 > monitorc.log 2>&1 &
-            """,
+cd /home/ubuntu/proyecto2-autoscaling
+source venv/bin/activate
+PYTHONPATH=. nohup python monitor_c/server.py 50051 > monitorc.log 2>&1 &
+""",
+
             TagSpecifications=[
                 {
                     "ResourceType": "instance",
@@ -113,7 +133,6 @@ class ControllerASG:
         )
 
         return instance_id
-
 
     def terminate_instance(self, instance_id):
 
