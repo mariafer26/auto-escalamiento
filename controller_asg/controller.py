@@ -70,11 +70,32 @@ class ControllerASG:
 
         return instances
 
+    def get_protected_instance_ids(self):
+
+        protected_ids = self.config.get(
+            "protected_instance_ids",
+            []
+        )
+
+        for instance in self.list_instances():
+
+            if instance["name"] in [
+                "monitor-controller",
+                "monitorc-1"
+            ]:
+                protected_ids.append(
+                    instance["id"]
+                )
+
+        return list(set(protected_ids))
+
     def get_instance_addresses(self):
 
         instances = self.list_instances()
 
         addresses = []
+
+        protected_ids = self.get_protected_instance_ids()
 
         valid_names = [
             "monitorc-1",
@@ -86,6 +107,7 @@ class ControllerASG:
             if (
                 instance["public_ip"]
                 and instance["name"] in valid_names
+                and instance["name"] != "monitor-controller"
             ):
 
                 addresses.append(
@@ -135,6 +157,16 @@ PYTHONPATH=. nohup python monitor_c/server.py 50051 > monitorc.log 2>&1 &
         return instance_id
 
     def terminate_instance(self, instance_id):
+
+        protected_ids = self.get_protected_instance_ids()
+
+        if instance_id in protected_ids:
+
+            print(
+                f"Protected instance, not terminated: {instance_id}"
+            )
+
+            return
 
         self.ec2.terminate_instances(
             InstanceIds=[

@@ -21,5 +21,9 @@
 
     "key_name": "proyecto2-key",
 
-    "subnet_id": "subnet-0aa98311123f840ad"
+    "subnet_id": "subnet-0aa98311123f840ad",
+
+    "excluded_instance_ids": [
+        "i-098104a0392349c0c"
+                        ]
 }
