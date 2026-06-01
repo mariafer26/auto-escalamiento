@@ -130,7 +130,7 @@ class ControllerASG:
             SubnetId=self.config["subnet_id"],
 
             UserData="""#!/bin/bash
-cd /home/ubuntu/proyecto2-autoscaling
+cd /home/ubuntu/auto-escalamiento
 source venv/bin/activate
 PYTHONPATH=. nohup python monitor_c/server.py 50051 > monitorc.log 2>&1 &
 """,
