@@ -1,7 +1,6 @@
 import json
 import boto3
 
-
 class ControllerASG:
 
     def __init__(self, config_path="config/settings.json"):
